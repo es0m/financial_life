@@ -572,6 +572,7 @@ class Account(object):
 
         self._account = int(amount * 100)               # amount of money to start with
         self._interest = interest                       # interest rate
+        self._interest_paydate = { 'month': 12, 'day': 31}
 
         self._current_date = self._date_start           # current date of the simulation
         self._caccount = self._account                  # current account, this variable
@@ -583,6 +584,9 @@ class Account(object):
     def __str__(self):
         return self._name
 
+    def set_monthly_interest(self): 
+        self._interest_paydate['month'] = -1
+        
     @property
     def date(self):
         return self._date
@@ -729,6 +733,20 @@ class DummyAccount(Account):
         self._name = validate.valid_name(name)
 
 
+# tests if interest is added. takes into account if fewer days than days in month. 
+def is_interest_payday(current_date, interest_paydate):
+    from calendar import monthrange
+    """ Checks, whether it is time to book the interests to the account """
+    mr = monthrange(current_date.year, current_date.month) 
+    if ( interest_paydate['day']>mr[1] ): 
+        test_day = mr[1]
+    else:
+        test_day = interest_paydate['day']
+        
+    return (((current_date.day == test_day) and
+            ((interest_paydate['month'] == -1) or ( current_date.month == interest_paydate['month']))))
+
+
 
 # now the implementation of the real, usable classes begins. In contrast to the account class,
 # in these classes, report gets some semantic information about how to handle different
@@ -822,8 +840,8 @@ class Bank_Account(Account):
 
     def interest_time(self):
         """ Checks, whether it is time to book the interests to the account """
-        return ((self._current_date.day == self._interest_paydate['day']) and
-                (self._current_date.month == self._interest_paydate['month']))
+        return is_interest_payday(self._current_date, self._interest_paydate)
+                
 
     def payment_input(self, account_str, payment, kind, description, meta):
         """ Input function for payments. This account is the receiver
@@ -891,6 +909,7 @@ class Bank_Account(Account):
         # if paydate is there, add the summed interest to the account
         if self.interest_time():
             self.exec_interest_time()
+
 
 
 class Loan(Account):
@@ -987,8 +1006,7 @@ class Loan(Account):
 
     def interest_time(self):
         """ Checks, whether it is time to book the interests to the account """
-        return (((self._current_date.day == self._interest_paydate['day']) and
-                (self._current_date.month == self._interest_paydate['month'])) or
+        return (is_interest_payday(self._current_date, self._interest_paydate) or
                 (self._caccount > 0))
 
     def payment_input(self, account_str, payment, kind, description, meta):
