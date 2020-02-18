@@ -1074,6 +1074,22 @@ class Loan(Account):
         # if paydate is there, add the summed interest to the account
         if self.interest_time():
             self.exec_interest_time()
+            
+class FixedInterestLoan(Loan):
+    """
+    A loan that has fixed interest for a given length of time
+    """
+
+    def __init__(self, amount, interest_fixed, interest_variable, time_delta, date = None, name = None, meta = {}):
+        super().__init__(amount=amount, interest=interest_fixed, date=date, name=name, meta=meta)
+        self._end_fixed = self._date_start + time_delta
+        self._interest_variable = interest_variable
+        
+    def start_of_day(self):
+        if ( self._current_date>=self._end_fixed ) : 
+            self._interest = self._interest_variable(self)
+        super().start_of_day()
+
 
 class Property(Account):
     """

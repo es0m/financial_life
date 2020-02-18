@@ -11,6 +11,7 @@ from datetime import timedelta
 # own libraries
 from financial_life.financing import accounts as a
 from financial_life.tax import germany as tax_ger
+from financial_life.tax import uk as tax_uk
 
 
 def controller_tax(s):
@@ -49,7 +50,7 @@ def controller_tax(s):
         # subtract the payed interests from the brutto we earned in the last year
         m_tax_relevant_money = m_brutto + m_interests
         # now, we apply german tax rules from 2016 to the tax-relevant money
-        m_tax, m_tax_percentage = tax_ger.tax_to_pay(2016, m_tax_relevant_money)
+        m_tax, m_tax_percentage = tax_uk.tax_to_pay(2019, m_tax_relevant_money)
         # this is the money we either receive from the state (positive value
         # or we need to pay (negative value)
         m_diff = m_paid - m_tax
@@ -90,13 +91,13 @@ def example_meta_controller(print_it = True):
     # our employee receives monthly 2000 netto, coming from 2500 brutto,
     # 310 are subtracted directly from the loan, which is less than she
     # needs to pay. 190 are paid for insurance
-    simulation.add_regular('Income', account, 2000, 
+    simulation.add_regular('Income', account, 6000, 
                            interval = 'monthly', 
                            date_start="01.09.2016", 
                            meta={'type': 'income', 
                                  'tax': {
-                                         'brutto': 2500, 
-                                         'paid': 310,
+                                         'brutto': 9991, 
+                                         'paid': 2677,
                                          'insurance': 190
                                          }
                                 }
