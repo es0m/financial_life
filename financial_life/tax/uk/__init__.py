@@ -64,3 +64,58 @@ tax_functions = {
     2017: tax_to_pay_2017,
     2016: tax_to_pay_2016
     }
+    
+def cms_to_pay(year, relevant_money, qual_kids, other_kids):
+    """ calculates the child maintenance amount from the gross minus pension pay
+    see https://www.citizensadvice.org.uk/family/children-and-young-people/child-maintenance/child-maintenance-2012-scheme/child-maintenance-calculation/the-2012-child-maintenance-scheme-calculating-maintenance/
+    
+    Returns the cms and the percentage of the cms """
+    
+    if relevant_money <= 0 or qual_kids<=0:
+        return 0, 0
+        
+    other_kids = max(0, other_kids)
+    other_kids = min(3, other_kids)
+    weekly = relevant_money/52
+    print(weekly)
+    if weekly<7: 
+        return 0, 0.0
+    if weekly<100: 
+        # flat rate
+        return 52*7, float(7)/weekly
+    if weekly<200:
+        # reduced rate
+        cms = 7
+        weekly_r = weekly-100
+        q1_row = [17, 14.1, 13.2, 12.4]
+        q2_row = [25, 21.2, 19.9, 18.9]
+        q3_row = [31, 26.4, 24.9, 23.8]
+        if qual_kids == 1: 
+            p = q1_row[other_kids]
+        if qual_kids == 2:
+            p = q2_row[other_kids]
+        if qual_kids >= 3: 
+            p = q3_row[other_kids]
+        cms = cms + float(int(weekly_r*p))/100
+        return 52*cms, cms/weekly
+    # basic rate:
+    reduction = [0, 11, 14, 16]
+    weekly_r = weekly-(int(reduction[other_kids]*weekly)/100)
+    p_basic = [12, 16, 19]
+    weekly_basic = min(800, weekly_r)
+    cms_basic = float(weekly_basic*p_basic[qual_kids-1])/100
+    print('basic:' + str(cms_basic))
+    
+    if weekly_r <= 800.00: 
+        return 52*cms_basic, 1.0*cms_basic/weekly
+        
+    # basic plus rate: 
+    weekly_r_plus = weekly_r-800
+    p_basic_plus = [9, 12, 15]
+    cms_basic_plus = float(weekly_r_plus*p_basic_plus[qual_kids-1])/100
+    print('basic plus:' + str(cms_basic_plus))
+    
+    cms_full = cms_basic + cms_basic_plus
+    return 52*cms_full, float(cms_full)/weekly
+    
+

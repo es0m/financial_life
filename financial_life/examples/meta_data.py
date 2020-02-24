@@ -169,13 +169,10 @@ def controller_cms_uk(s):
         # using list comprehensions, we can easily calculate a few sums
         m_pension = sum(p.value for p in pension_report)
         
-        # as interests for loans are negative, we effectively
-        # subtract the payed interests from the gross we earned in the last year
+        # cms wants gross less pensions
         m_cms_relevant_money = m_gross - m_pension
-        # now, we apply german tax rules from 2016 to the tax-relevant money
-        m_cms_percentage = 0.09
-        #m_tax, m_tax_percentage = tax_uk.tax_to_pay(tax_year_start.year, m_tax_relevant_money)
-        m_cms = int(m_cms_relevant_money*m_cms_percentage*100)/100
+        # cms for one child
+        m_cms, m_cms_percentage = tax_uk.cms_to_pay(s.current_date.year, m_cms_relevant_money, 1, 0)
         
         m_cms_reg = int(100*m_cms/12)/100
         m_cms_rest = int(100*m_cms-11*m_cms_reg*100)/100
@@ -218,31 +215,31 @@ def example_meta_controller(print_it = True):
     # our employee receives monthly 2000 netto, coming from 2500 gross,
     # 310 are subtracted directly from the loan, which is less than she
     # needs to pay. 190 are paid for insurance
-    simulation.add_regular('Income', account, 6000, 
+    simulation.add_regular('Income', account, 4000, 
                            interval = 'monthly', 
                            date_start="01.09.2016", 
                            meta={'type': 'income', 
                                  'tax': {
-                                         'gross': 9991, 
-                                         'paid': 2677,
+                                         'gross': 10000, 
+                                         'paid': 2000,
                                          'insurance': 190
                                          }
                                 }
                            )
-    simulation.add_regular(account, pension, 2000, 
+    simulation.add_regular(account, pension, 0000, 
                            interval = 'monthly', 
                            date_start="01.09.2016", 
                            meta={'type': 'pension'}
                            )
 
-    simulation.add_regular(account, loan, lambda: min(1500, -loan.account), 
-                           interval = 'monthly', 
-                           date_start="01.09.2016")
+    #simulation.add_regular(account, loan, lambda: min(1500, -loan.account), 
+    #                       interval = 'monthly', 
+    #                       date_start="01.09.2016")
     #simulation.add_controller(controller_tax_uk)
     simulation.add_controller(controller_cms_uk)
 
     # simulate for ten years
-    simulation.simulate(delta = timedelta(days=365*10))
+    simulation.simulate(delta = timedelta(days=365*3))
 
     # this function is also part of a unittest. Therefore, we want to be able to
     # control, whether we print some information or not
