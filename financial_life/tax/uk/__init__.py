@@ -77,7 +77,6 @@ def cms_to_pay(year, relevant_money, qual_kids, other_kids):
     other_kids = max(0, other_kids)
     other_kids = min(3, other_kids)
     weekly = relevant_money/52
-    print(weekly)
     if weekly<7: 
         return 0, 0.0
     if weekly<100: 
@@ -104,7 +103,6 @@ def cms_to_pay(year, relevant_money, qual_kids, other_kids):
     p_basic = [12, 16, 19]
     weekly_basic = min(800, weekly_r)
     cms_basic = float(weekly_basic*p_basic[qual_kids-1])/100
-    print('basic:' + str(cms_basic))
     
     if weekly_r <= 800.00: 
         return 52*cms_basic, 1.0*cms_basic/weekly
@@ -113,7 +111,6 @@ def cms_to_pay(year, relevant_money, qual_kids, other_kids):
     weekly_r_plus = weekly_r-800
     p_basic_plus = [9, 12, 15]
     cms_basic_plus = float(weekly_r_plus*p_basic_plus[qual_kids-1])/100
-    print('basic plus:' + str(cms_basic_plus))
     
     cms_full = cms_basic + cms_basic_plus
     return 52*cms_full, float(cms_full)/weekly
