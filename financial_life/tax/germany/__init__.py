@@ -5,7 +5,10 @@ def tax_to_pay(year, *args, **kwargs):
     This functions simply calls the year-dependent function with 
     the given parameters, but this function don't really care about
     the content of the other arguments """
-    return tax_functions[year](*args, **kwargs)
+    if year in tax_functions: 
+        return tax_functions[year](*args, **kwargs)
+    else: 
+        return tax_to_pay_2016(*args, **kwargs)
 
 def tax_to_pay_2016(tax_relevant_money, splitting = False):
     """ calculates the tax for year 2016 
