@@ -220,13 +220,13 @@ def example_meta_controller(print_it = True):
                            date_start="01.09.2016", 
                            meta={'type': 'income', 
                                  'tax': {
-                                         'gross': 10000, 
+                                         'gross': 6000, 
                                          'paid': 2000,
                                          'insurance': 190
                                          }
                                 }
                            )
-    simulation.add_regular(account, pension, 0000, 
+    simulation.add_regular(account, pension, 2000, 
                            interval = 'monthly', 
                            date_start="01.09.2016", 
                            meta={'type': 'pension'}
@@ -235,7 +235,7 @@ def example_meta_controller(print_it = True):
     #simulation.add_regular(account, loan, lambda: min(1500, -loan.account), 
     #                       interval = 'monthly', 
     #                       date_start="01.09.2016")
-    #simulation.add_controller(controller_tax_uk)
+    simulation.add_controller(controller_tax_uk)
     simulation.add_controller(controller_cms_uk)
 
     # simulate for ten years

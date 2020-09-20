@@ -1,20 +1,33 @@
-""" help functions for UK tax declaration """
+""" help functions for UK tax declaration 
+  https://www.gov.uk/government/publications/rates-and-allowances-income-tax/income-tax-rates-and-allowances-current-and-past
 
+  The tax bands are for England and Wales, rates differ in Scotland.
+  
+"""
 def tax_to_pay(year, *args, **kwargs):
     """ generic functions to call the tax-function for any year. 
     This functions simply calls the year-dependent function with 
     the given parameters, but this function don't really care about
     the content of the other arguments """
+    min_year = min(tax_functions.keys())
+    max_year = max(tax_functions.keys())
+    year = min([max_year, year])
+    year = max([min_year, year])
+    
     if year in tax_functions: 
         return tax_functions[year](*args, **kwargs)
     else: 
-        return tax_to_pay_2019(*args, **kwargs)
-
+        assert(False)
+        return tax_functions[min_year](*args, **kwargs)
+        
 def personal_allowance(taxable_pay, pa_limit):
     diff = min(max(0, taxable_pay-100000), 2*pa_limit)
     pa = pa_limit-diff/2
     return pa
         
+def tax_to_pay_2020(tax_relevant_money, splitting = False):
+    return tax_to_pay_generic(tax_relevant_money, 12500, [37500, 150000, 1e99], splitting)
+
 def tax_to_pay_2019(tax_relevant_money, splitting = False):
     return tax_to_pay_generic(tax_relevant_money, 12500, [37500, 150000, 1e99], splitting)
 
@@ -59,6 +72,7 @@ def tax_to_pay_generic(tax_relevant_money, allowance, limits_bha, splitting):
     
 
 tax_functions = {
+    2020: tax_to_pay_2020,
     2019: tax_to_pay_2019,
     2018: tax_to_pay_2018,
     2017: tax_to_pay_2017,

@@ -157,35 +157,34 @@ def pension_example():
     pension = a.Bank_Account(amount = 18000, interest = 0.05, name = 'Pension')
     pension.set_monthly_interest()
 
-    simulation = a.Simulation(account, pension, name = 'Testsimulation')
+    simulation = a.Simulation(pension, name = 'Testsimulation')
+    # 11 / 23.7
     simulation.add_regular(from_acc = 'Income',
                            to_acc = pension,
-                           payment = 1275.00,
+                           payment = 1000.0,
                            interval = 'monthly',
                            date_start = datetime(2016,9,15),
                            day = 28,
                            name = 'Pension')
+    pension.set_monthly_interest()
                            
     simulation.simulate(delta=timedelta(days=365*20))
     simulation.plt_summary()
     show()
-    print(pension.report)
+    print(pension.report.yearly())
 
 def house_example():
     account = a.Bank_Account(amount = 1000, interest = 0.001, name = 'Main account')
     account.set_monthly_interest()
-    loan = a.FixedInterestLoan(amount = 320000.00, interest_fixed = 0.0194, 
-                interest_variable=lambda loan: relativedelta(loan._current_date, loan._end_fixed).months*0.03/12, 
+    loan = a.FixedInterestLoan(amount = 100000.00, interest_fixed = 0.02, 
+                interest_variable=lambda loan: relativedelta(loan._current_date, loan._end_fixed).months*0.02/12, 
         time_delta = relativedelta(months=60), 
         name = 'House Credit')
     loan.set_monthly_interest()
-    #loan2 = a.FixedInterestLoan(amount = 0.00, interest_fixed = 0.0144, interest_variable=0.025, date = date.now() + relativedelta(months=60), time_delta = #relativedelta(months=60), 
-        #name = 'House Credit 2')
-    #loan2.set_monthly_interest()
     
-    house = a.Property(450000, 450000+loan.account, loan, name='House')
+    house = a.Property(150000, 150000+loan.account, loan, name='House')
 
-    simulation = a.Simulation(account, loan, house, name = 'ES1')
+    simulation = a.Simulation(account, loan, house, name = 'House1')
     simulation.add_regular(from_acc = 'Income',
                            to_acc = account,
                            payment = 4500,
@@ -215,6 +214,6 @@ def house_example():
 
 
 if __name__ == '__main__':
-    #pension_example()
+    pension_example()
     house_example()
 
